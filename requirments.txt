@@ -1,0 +1,3 @@
+# requirments.txt
+snowflake-snowpark-phyton
+streamlit
