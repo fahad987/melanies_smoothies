@@ -47,7 +47,12 @@ if name_on_order:
             session.sql(my_insert_stmt).collect()
             st.success(f"Your Smoothie is ordered, {name_on_order}! ✅")
 
-smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
+ if ingredients_list:
+        ingredients_string = ''
+
+        for fruit_chosen in ingredients_list:
+            ingredients_string += fruit_chosen + ' '
+            smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
 
 if smoothiefroot_response.status_code == 200:
     # JSON data ko variable mein save karein
