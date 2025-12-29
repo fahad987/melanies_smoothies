@@ -47,22 +47,28 @@ if name_on_order:
             session.sql(my_insert_stmt).collect()
             st.success(f"Your Smoothie is ordered, {name_on_order}! ✅")
 
- if ingredients_list:
-        ingredients_string = ''
+if ingredients_list:
+    ingredients_string = ''
 
-        for fruit_chosen in ingredients_list:
-            ingredients_string += fruit_chosen + ' '
-            smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
+    for fruit_chosen in ingredients_list:
+        ingredients_string += fruit_chosen + ' '
+        
+        st.subheader(fruit_chosen + ' Nutrition Information')
+        # API Call har fruit ke liye loop ke andar honi chahiye
+        smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/" + fruit_chosen)
+        
+        if smoothiefroot_response.status_code == 200:
+            json_data = smoothiefroot_response.json()
+            st.dataframe(data=json_data, use_container_width=True)
+        else:
+            st.error(f"Could not find nutrition info for {fruit_chosen}")
 
-if smoothiefroot_response.status_code == 200:
-    # JSON data ko variable mein save karein
-    json_data = smoothiefroot_response.json()
-    
-    # Raw JSON dekhne ke liye
-    st.text(json_data)
-    
-    # JSON ko readable format (Table) mein dikhane ke liye normalize karein
-    df_readable = pd.json_normalize(json_data)
-    st.dataframe(data=df_readable, use_container_width=True)
-else:
-    st.error("API se data nahi mil raha hai. Please link check karein.")
+    # Order submit karne ka code (loop ke bahar)
+    my_insert_stmt = """ insert into smoothies.public.orders(INGREDIENTS, NAME_ON_ORDER)
+            values ('""" + ingredients_string + """','""" + name_on_order + """')"""
+
+    time_to_insert = st.button('Submit Order')
+
+    if time_to_insert:
+        session.sql(my_insert_stmt).collect()
+        st.success('Your Smoothie is ordered!', icon="✅")
