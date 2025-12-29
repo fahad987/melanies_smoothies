@@ -1,27 +1,25 @@
-# Import python packages
 import streamlit as st
 from snowflake.snowpark.functions import col
 
-# Write directly to the app
-streamlit.title("My Parents New Healthy Diner")
-st.write(
-  """Choose the fruits you want in your custom Smoothie!.
-  """
-)
+# Title and introduction
+st.title("My Parents' New Healthy Diner")
+st.write("Choose the fruits you want in your custom Smoothie!")
+
+# Get the name for the order
 name_on_order = st.text_input('Name on smoothie:')
-st.write('The name on your smoothie will be: ',name_on_order)
+st.write('The name on your smoothie will be:', name_on_order)
 
-#title = st.text_input('Move Title', 'Life Of Brain')
-#st.write('The Current movie title is ', title)
-
+# Connect to Snowflake
 cnx = st.connection("snowflake")
 session = cnx.session()
 
+# Load fruit options
 my_dataframe = session.table("smoothies.public.fruit_options").select(col('Fruit_name'))
-st.dataframe(data=my_dataframe, use_container_width=True)
+# st.dataframe(data=my_dataframe, use_container_width=True) # Optional: display the table
 
 st.header("🍓 Build Your Smoothie")
 
+# Multi-select for ingredients
 ingredients_list = st.multiselect(
     "Choose up to 5 ingredients:",
     my_dataframe,
@@ -34,7 +32,7 @@ if ingredients_list:
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
     
-    # Ensure this line aligns perfectly with the 'for' loop above
+    # Building the SQL Insert Statement
     my_insert_stmt = """ insert into smoothies.public.orders(INGREDIENTS, NAME_ON_ORDER)
             values ('""" + ingredients_string + """','""" + name_on_order + """')"""
 
@@ -42,9 +40,4 @@ if ingredients_list:
 
     if time_to_insert:
         session.sql(my_insert_stmt).collect()
-        st.success('Your Smoothie is ordered, ' + name_on_order + '!', icon="✅")
-        
-   # if ingredients_string:
-    #    session.sql(my_insert_stmt).collect()
-
-        st.success('Your Smoothie is ordered!')
+        st.success(f'Your Smoothie is ordered, {name_on_order}!', icon="✅")
