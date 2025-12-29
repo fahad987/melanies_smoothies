@@ -46,7 +46,18 @@ if name_on_order:
         if st.button("Submit Order"):
             session.sql(my_insert_stmt).collect()
             st.success(f"Your Smoothie is ordered, {name_on_order}! ✅")
-import requests
+
 smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
-st.text(smoothiefroot_response.json())
-sf_df = st.dataframe(data=smoothiefroot_response.json(),use_container_width=True)
+
+if smoothiefroot_response.status_code == 200:
+    # JSON data ko variable mein save karein
+    json_data = smoothiefroot_response.json()
+    
+    # Raw JSON dekhne ke liye
+    st.text(json_data)
+    
+    # JSON ko readable format (Table) mein dikhane ke liye normalize karein
+    df_readable = pd.json_normalize(json_data)
+    st.dataframe(data=df_readable, use_container_width=True)
+else:
+    st.error("API se data nahi mil raha hai. Please link check karein.")
