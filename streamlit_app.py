@@ -18,7 +18,11 @@ session = cnx.session()
 
 # Get Fruit Options from Snowflake
 my_dataframe = session.table("smoothies.public.fruit_options").select(col('Fruit_name'),col('SEARCH_ON'))
-st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
+# st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
+# st.stop()
+
+pd_df =my_dataframe.to_pandas()
+st.dataframe(pd_df)
 st.stop()
 
 # Build the Multiselect
