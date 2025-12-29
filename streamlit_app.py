@@ -46,7 +46,7 @@ if ingredients_list:
         st.subheader(fruit_chosen + ' Nutrition Information')
         try:
             # API Call using the fruit name
-            smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/" + fruit_chosen)
+            smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/{search_on}" + fruit_chosen)
             if smoothiefroot_response.status_code == 200:
                 sf_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
             else:
